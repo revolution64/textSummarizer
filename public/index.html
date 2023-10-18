@@ -211,8 +211,9 @@
         summaryBox.textContent = ''; // Clear the summary box
         summaryBox.style.display = 'none'; // Hide the summary box
 
+        const url = location.protocol + '//' + location.host + '/summarize';
         // Make an API call
-        fetch('http://localhost:3000/summarize', {
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
