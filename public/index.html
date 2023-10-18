@@ -24,7 +24,7 @@
         }
 
         h1 {
-            color: #007bff; /* Blue title color */
+            color: #1fc1c3; /* Blue title color */
         }
 
         label {
@@ -62,7 +62,7 @@
         }
 
         button {
-            background-color: #007bff;
+            background-color: #1fc1c3;
             color: #fff;
             border: none;
             border-radius: 50px;
@@ -88,7 +88,7 @@
         .loader {
             display: none; /* Hidden by default */
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            border-top: 4px solid #1fc1c3;
             border-radius: 50%;
             width: 20px;
             height: 20px;
@@ -150,7 +150,7 @@
         }
 
         select:focus, textarea:focus {
-            border-color: #007bff;
+            border-color: #1fc1c3;
         }
 
         .fade-in {
@@ -169,16 +169,30 @@
     <div class="container">
         <h1>AI Generated Text Summarizer</h1>
         <div class="form-group">
-            <label for="numSentences">Approximate number of sentences:</label>
+            <label for="numSentences">Summary length:</label>
             <select id="numSentences" required>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="5">6</option>
-                <option value="5">7</option>
-                <option value="5">8</option>
-                <option value="5">9</option>
-                <option value="5">10</option>
+                <option value="several">Random</option>
+                <option value="3">3 sentences</option>
+                <option value="4">4 sentences</option>
+                <option value="5">5 sentences</option>
+                <option value="6">6 sentences</option>
+                <option value="7">7 sentences</option>
+                <option value="8">8 sentences</option>
+                <option value="9">9 sentences</option>
+                <option value="10">10 sentences</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="targetLanguage">Target Language:</label>
+            <select id="targetLanguage" required>
+                <option value="english">English</option>
+                <option value="dutch">Dutch</option>
+                <option value="german">German</option>
+                <option value="french">French</option>
+                <option value="spanish">Spanish</option>
+                <option value="italian">Italian</option>
+                <option value="portuguese">Portuguese</option>
+                <option value="russian">Russian</option>
             </select>
         </div>
         <div class="form-group">
@@ -196,6 +210,7 @@
     const summarizeButton = document.getElementById('summarizeButton');
     const numSentencesInput = document.getElementById('numSentences');
     const textToSummarizeInput = document.getElementById('textToSummarize');
+    const targetLanguageInput = document.getElementById('targetLanguage');
     const summaryTitle = document.getElementById('summaryTitle');
     const summaryBox = document.getElementById('summaryBox');
     const loader = document.getElementById('loader');
@@ -203,6 +218,7 @@
     summarizeButton.addEventListener('click', () => {
         const numSentences = numSentencesInput.value;
         const textToSummarize = textToSummarizeInput.value;
+        const targetLanguage = targetLanguageInput.value;
 
         // Display the loader and disable the button during the API call
         loader.style.display = 'block';
@@ -219,7 +235,8 @@
             },
             body: JSON.stringify({
                 numberOfSentences: numSentences,
-                textToSummarize: textToSummarize
+                textToSummarize: textToSummarize,
+                targetLanguage: targetLanguage
             })
         })
             .then(response => response.json())

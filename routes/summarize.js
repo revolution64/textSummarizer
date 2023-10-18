@@ -18,7 +18,7 @@ router.post('/', async function(req, res, next) {
         res.status(400);
         res.send('DAILY_SUMMARY_COUNT_SUCCEEDED');
     } else {
-        const response = await getSummary(req.body.textToSummarize, req.body.numberOfSentences);
+        const response = await getSummary(req.body.textToSummarize, req.body.numberOfSentences, req.body.targetLanguage);
         summarizeCount++;
         res.json(response);
     }
