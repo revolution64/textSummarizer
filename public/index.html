@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Summarizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: "Open Sans", Arial, sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        h1 {
+            color: #007bff; /* Blue title color */
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-right: 10px; /* Margin added to the right of the input fields */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px; /* Increase font size */
+        }
+
+        select:focus, textarea:focus {
+            border-color: #007bff; /* Change border color when focused */
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .summary-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .loader {
+            display: none; /* Hidden by default */
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+        /* Responsive Styles */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .form-group, label, input[type="number"], textarea {
+                width: 100%;
+                margin-right: 0; /* No margin on small screens */
+            }
+            button {
+                width: 100%;
+            }
+        }
+
+        /* Centering */
+        .centered {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+            height: 100vh;
+        }
+
+        /* Animation keyframes for fade-in effect */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s; /* Add transition effect for border color */
+        }
+
+        select:focus, textarea:focus {
+            border-color: #007bff;
+        }
+
+        .fade-in {
+            animation: fade-in 1s ease-in-out; /* Apply the fade-in animation */
+        }
+
+        .error-message {
+            color: #f00; /* Red color for error message */
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="centered">
+    <div class="container">
+        <h1>AI Generated Text Summarizer</h1>
+        <div class="form-group">
+            <label for="numSentences">Approximate number of sentences:</label>
+            <select id="numSentences" required>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="5">6</option>
+                <option value="5">7</option>
+                <option value="5">8</option>
+                <option value="5">9</option>
+                <option value="5">10</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="textToSummarize">Text to be summarized:</label>
+            <textarea id="textToSummarize" rows="5" required></textarea>
+        </div>
+        <button id="summarizeButton">Summarize</button>
+        <div class="loader" id="loader"></div>
+        <h2 id="summaryTitle" style="display: none;">Summary</h2>
+        <div class="summary-box" id="summaryBox" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    const summarizeButton = document.getElementById('summarizeButton');
+    const numSentencesInput = document.getElementById('numSentences');
+    const textToSummarizeInput = document.getElementById('textToSummarize');
+    const summaryTitle = document.getElementById('summaryTitle');
+    const summaryBox = document.getElementById('summaryBox');
+    const loader = document.getElementById('loader');
+
+    summarizeButton.addEventListener('click', () => {
+        const numSentences = numSentencesInput.value;
+        const textToSummarize = textToSummarizeInput.value;
+
+        // Display the loader and disable the button during the API call
+        loader.style.display = 'block';
+        summarizeButton.disabled = true;
+        summaryBox.textContent = ''; // Clear the summary box
+        summaryBox.style.display = 'none'; // Hide the summary box
+
+        // Make an API call
+        fetch('http://localhost:3000/summarize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                numberOfSentences: numSentences,
+                textToSummarize: textToSummarize
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Display the API response with a fade-in effect
+                summaryBox.textContent = data;
+                summaryBox.style.display = 'block';
+                summaryBox.classList.add('fade-in');
+
+                // Show the summary title
+                summaryTitle.style.display = 'block';
+            })
+            .catch(error => {
+                summaryBox.style.display = 'block';
+                summaryBox.textContent = 'Hourly summary limit reached - please try again later.';
+            })
+            .finally(() => {
+                // Hide the loader and enable the button when the API call is complete
+                loader.style.display = 'none';
+                summarizeButton.disabled = false;
+            });
+    });
+</script>
+</body>
+</html>
