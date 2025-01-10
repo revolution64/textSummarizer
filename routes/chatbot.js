@@ -6,6 +6,8 @@ router.post('/', async function(req, res, next) {
     const { callbackServer, callbackToken, room, data } = req.body;
     const [level, text] = data?.split(':') || ['OK', 'This is an example system message from chatbot'];
 
+    console.log(req.body);
+
     const headers = {
         'Authorization': `Bearer ${callbackToken}`,
         'Content-Type': 'application/json'
